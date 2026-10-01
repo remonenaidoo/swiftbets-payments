@@ -13,7 +13,7 @@ namespace SwiftBets.Payments.Infrastructure.Workers;
 /// if yesterday has no completed run yet. One replica doing it twice is harmless: a run only reads and reports.
 /// </summary>
 public sealed partial class DailyReconciliationWorker(
-    IServiceProvider services, IOptions<PaymentsOptions> options, TimeProvider time, PaymentsMetrics metrics, ILogger<DailyReconciliationWorker> logger) : BackgroundService
+    IServiceProvider services, IOptions<PaymentsOptions> options, TimeProvider time, ILogger<DailyReconciliationWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -26,7 +26,7 @@ public sealed partial class DailyReconciliationWorker(
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                metrics.SweepFailures.Add(1);
+                PaymentsMetrics.SweepFailed();
                 LogRunFailed(logger, ex);
             }
         }
@@ -52,7 +52,7 @@ public sealed partial class DailyReconciliationWorker(
             }
 
             var run = await handler.RunAsync(provider.Name, yesterday, cancellationToken);
-            metrics.RunCompleted(run.CompletedAt, run.Drifts.Count);
+            PaymentsMetrics.RunCompleted(provider.Name, run.CompletedAt, run.Drifts.Count);
             LogRun(logger, provider.Name, yesterday, run.Drifts.Count);
         }
     }

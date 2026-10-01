@@ -42,7 +42,7 @@ public static class AdminEndpoints
             await store.LatestRunAsync(provider, cancellationToken) is { } run ? Results.Ok(run) : Results.NotFound())
             .RequireAuthorization(PaymentPermissions.Read);
 
-        admin.MapPost("/reconciliation/{provider}/run", async (string provider, DateOnly? day, ReconciliationHandler reconciliation, TimeProvider time, PaymentsMetrics metrics, IPaymentProviders providers, HttpContext context, CancellationToken cancellationToken) =>
+        admin.MapPost("/reconciliation/{provider}/run", async (string provider, DateOnly? day, ReconciliationHandler reconciliation, TimeProvider time, IPaymentProviders providers, HttpContext context, CancellationToken cancellationToken) =>
         {
             if (providers.Find(provider) is null)
             {
@@ -50,7 +50,7 @@ public static class AdminEndpoints
             }
 
             var run = await reconciliation.RunAsync(provider, day ?? PaymentCalendar.DayOf(time.GetUtcNow()).AddDays(-1), cancellationToken);
-            metrics.RunCompleted(run.CompletedAt, run.Drifts.Count);
+            PaymentsMetrics.RunCompleted(run.Provider, run.CompletedAt, run.Drifts.Count);
             return Results.Ok(run);
         }).RequireAuthorization(PaymentPermissions.Approve);
 

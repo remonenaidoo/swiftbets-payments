@@ -7,7 +7,7 @@ using SwiftBets.Payments.Application;
 namespace SwiftBets.Payments.Infrastructure.Workers;
 
 /// <summary>Sweeps payments a webhook never finished, on a fixed interval.</summary>
-public sealed partial class OpenPaymentsWorker(IServiceProvider services, IOptions<PaymentsOptions> options, PaymentsMetrics metrics, ILogger<OpenPaymentsWorker> logger) : BackgroundService
+public sealed partial class OpenPaymentsWorker(IServiceProvider services, IOptions<PaymentsOptions> options, ILogger<OpenPaymentsWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -20,7 +20,7 @@ public sealed partial class OpenPaymentsWorker(IServiceProvider services, IOptio
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                metrics.SweepFailures.Add(1);
+                PaymentsMetrics.SweepFailed();
                 LogSweepFailed(logger, ex);
             }
         }

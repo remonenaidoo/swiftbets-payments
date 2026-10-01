@@ -10,7 +10,7 @@ public static class WebhookEndpoints
 {
     public static IEndpointRouteBuilder MapWebhooks(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/webhooks/{provider}", async (string provider, HttpContext context, WebhookHandler webhooks, PaymentsMetrics metrics, CancellationToken cancellationToken) =>
+        endpoints.MapPost("/webhooks/{provider}", async (string provider, HttpContext context, WebhookHandler webhooks, CancellationToken cancellationToken) =>
         {
             if (await context.Request.ReadRawBodyAsync() is not { } body)
             {
@@ -22,7 +22,7 @@ public static class WebhookEndpoints
                 var outcome = await webhooks.ReceiveAsync(provider, body, name => context.Request.Headers[name].FirstOrDefault(), cancellationToken);
                 if (outcome == WebhookOutcome.Unauthentic)
                 {
-                    metrics.WebhooksRejected.Add(1, new KeyValuePair<string, object?>("provider", provider));
+                    PaymentsMetrics.WebhookRejected(provider);
                 }
 
                 return outcome switch

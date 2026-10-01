@@ -30,7 +30,6 @@ public static class InfrastructureRegistration
         services.Configure<SimulatorOptions>(configuration.GetSection(SimulatorOptions.SectionName));
         services.Configure<PaystackOptions>(configuration.GetSection(PaystackOptions.SectionName));
         services.AddSingleton<IPaymentStore, SqlPaymentStore>();
-        services.AddSingleton<PaymentsMetrics>();
 
         // Events leave through the outbox; the relay runs in every replica.
         services.AddKafkaMessaging(configuration);

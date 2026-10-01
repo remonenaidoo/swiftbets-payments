@@ -1,32 +1,29 @@
-using System.Diagnostics.Metrics;
+using Prometheus;
 
 namespace SwiftBets.Payments.Infrastructure;
 
-/// <summary>Counters the payments alerts read (webhook rejections, sweep work, reconciliation drift and freshness).</summary>
-public sealed class PaymentsMetrics : IDisposable
+/// <summary>What the payments alerts read: webhook rejections, failing sweeps and reconciliation drift and freshness.</summary>
+public static class PaymentsMetrics
 {
-    public const string MeterName = "SwiftBets.Payments";
-    private readonly Meter _meter = new(MeterName);
-    private long _lastRunUnixSeconds;
-    private int _lastDriftCount;
+    private static readonly Counter WebhooksRejectedCounter = Metrics.CreateCounter(
+        "swiftbets_payments_webhooks_rejected_total", "Webhook deliveries refused for a bad, missing or expired signature, by provider.", new CounterConfiguration { LabelNames = ["provider"] });
 
-    public PaymentsMetrics()
+    private static readonly Counter SweepFailuresCounter = Metrics.CreateCounter(
+        "swiftbets_payments_sweep_failures_total", "Open-payment sweeps or reconciliation runs that threw.");
+
+    private static readonly Gauge Drifts = Metrics.CreateGauge(
+        "swiftbets_payments_reconciliation_drifts", "Drifts found by the latest reconciliation run, by provider.", new GaugeConfiguration { LabelNames = ["provider"] });
+
+    private static readonly Gauge LastCompleted = Metrics.CreateGauge(
+        "swiftbets_payments_reconciliation_last_completed_timestamp_seconds", "Unix time the latest reconciliation run completed, by provider.", new GaugeConfiguration { LabelNames = ["provider"] });
+
+    public static void WebhookRejected(string provider) => WebhooksRejectedCounter.WithLabels(provider).Inc();
+
+    public static void SweepFailed() => SweepFailuresCounter.Inc();
+
+    public static void RunCompleted(string provider, DateTimeOffset at, int drifts)
     {
-        WebhooksRejected = _meter.CreateCounter<long>("payments_webhooks_rejected_total", description: "Webhook deliveries refused for a bad or missing signature.");
-        SweepFailures = _meter.CreateCounter<long>("payments_sweep_failures_total", description: "Sweeps or reconciliation runs that threw.");
-        _meter.CreateObservableGauge("payments_reconciliation_last_run_timestamp_seconds", () => Interlocked.Read(ref _lastRunUnixSeconds), description: "When the last reconciliation completed.");
-        _meter.CreateObservableGauge("payments_reconciliation_drifts", () => Volatile.Read(ref _lastDriftCount), description: "Drifts the last reconciliation found.");
+        Drifts.WithLabels(provider).Set(drifts);
+        LastCompleted.WithLabels(provider).Set(at.ToUnixTimeSeconds());
     }
-
-    public Counter<long> WebhooksRejected { get; }
-
-    public Counter<long> SweepFailures { get; }
-
-    public void RunCompleted(DateTimeOffset at, int drifts)
-    {
-        Interlocked.Exchange(ref _lastRunUnixSeconds, at.ToUnixTimeSeconds());
-        Volatile.Write(ref _lastDriftCount, drifts);
-    }
-
-    public void Dispose() => _meter.Dispose();
 }
