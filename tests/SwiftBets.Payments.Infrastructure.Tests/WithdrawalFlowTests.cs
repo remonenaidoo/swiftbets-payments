@@ -30,7 +30,8 @@ public sealed class WithdrawalFlowTests(SqlServerFixture sql)
         var requested = (await rig.Withdrawals.RequestAsync(Customer, 20_000, "ZAR", CancellationToken.None)).Value!;
         await rig.DeliveredAsync(1);
 
-        requested.Status.ShouldBe(WithdrawalStatus.Submitted);
+        // The simulator pays out at once, so its webhook can win the race with recording the submission.
+        requested.Status.ShouldBeOneOf(WithdrawalStatus.Submitted, WithdrawalStatus.Paid);
         var paid = (await rig.Store.GetWithdrawalAsync(requested.WithdrawalId, CancellationToken.None))!;
         (paid.Status, paid.HoldSettled).ShouldBe((WithdrawalStatus.Paid, true));
         rig.Wallet.HoldState(paid.ReservationId).ShouldBe("paid");
