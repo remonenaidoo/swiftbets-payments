@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SwiftBets.Payments.Api/SwiftBets.Payments.Api.csproj" />
+    <Project Path="src/SwiftBets.Payments.Application/SwiftBets.Payments.Application.csproj" />
+    <Project Path="src/SwiftBets.Payments.Domain/SwiftBets.Payments.Domain.csproj" />
+    <Project Path="src/SwiftBets.Payments.Infrastructure/SwiftBets.Payments.Infrastructure.csproj" />
+    <Project Path="src/SwiftBets.Payments.Migrator/SwiftBets.Payments.Migrator.csproj" />
+    <Project Path="src/SwiftBets.Payments.Simulator/SwiftBets.Payments.Simulator.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SwiftBets.Payments.Api.Tests/SwiftBets.Payments.Api.Tests.csproj" />
+    <Project Path="tests/SwiftBets.Payments.ArchitectureTests/SwiftBets.Payments.ArchitectureTests.csproj" />
+    <Project Path="tests/SwiftBets.Payments.Domain.Tests/SwiftBets.Payments.Domain.Tests.csproj" />
+    <Project Path="tests/SwiftBets.Payments.Infrastructure.Tests/SwiftBets.Payments.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

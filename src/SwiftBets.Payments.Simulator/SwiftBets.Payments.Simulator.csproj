@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <PackageReference Include="SwiftBets.BuildingBlocks.Observability" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Web" />
+    <ProjectReference Include="../SwiftBets.Payments.Domain/SwiftBets.Payments.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="SwiftBets.Payments.Simulator.Tests" />
+  </ItemGroup>
+</Project>
