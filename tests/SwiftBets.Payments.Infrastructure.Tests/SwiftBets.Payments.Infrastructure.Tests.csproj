@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Testing" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Dapper" />
+    <ProjectReference Include="../../src/SwiftBets.Payments.Infrastructure/SwiftBets.Payments.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/SwiftBets.Payments.Migrator/SwiftBets.Payments.Migrator.csproj" Aliases="migrator" />
+    <ProjectReference Include="../../src/SwiftBets.Payments.Simulator/SwiftBets.Payments.Simulator.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Recorded/*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Shouldly" />
+  </ItemGroup>
+</Project>

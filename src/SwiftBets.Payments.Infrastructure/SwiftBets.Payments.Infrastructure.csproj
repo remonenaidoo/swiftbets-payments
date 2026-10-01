@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="SwiftBets.BuildingBlocks.Core" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Persistence" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Messaging" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Outbox" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Resilience" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Web" />
+    <PackageReference Include="SwiftBets.Contracts" />
+    <PackageReference Include="SwiftBets.Contracts.Grpc" />
+    <PackageReference Include="Grpc.Net.ClientFactory" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
+    <PackageReference Include="Dapper" />
+    <ProjectReference Include="../SwiftBets.Payments.Application/SwiftBets.Payments.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Sql/*.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="SwiftBets.Payments.Infrastructure.Tests" />
+  </ItemGroup>
+</Project>
