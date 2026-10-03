@@ -15,7 +15,8 @@ builder.Services.AddSwiftBetsWeb();
 builder.Services.AddSwiftBetsJwtBearer(builder.Configuration);
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(PaymentPermissions.Read, p => p.RequireClaim("perm", PaymentPermissions.Read))
-    .AddPolicy(PaymentPermissions.Approve, p => p.RequireClaim("perm", PaymentPermissions.Approve));
+    .AddPolicy(PaymentPermissions.Approve, p => p.RequireClaim("perm", PaymentPermissions.Approve))
+    .AddPolicy(PaymentPermissions.SweepNow, p => p.RequireAssertion(c => c.User.HasClaim("perm", PaymentPermissions.Approve) || c.User.IsInRole("Service")));
 builder.Services.AddPaymentsApplication();
 builder.Services.AddPaymentsInfrastructure(builder.Configuration);
 

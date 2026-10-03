@@ -38,6 +38,11 @@ public static class AdminEndpoints
             return outcome.Error is { } error ? Problem(error, context) : Results.Ok(View(outcome.Value!));
         }).RequireAuthorization(PaymentPermissions.Approve);
 
+        // Replays what the webhooks missed: asks each provider about every open payment now, instead of at the next sweep.
+        admin.MapPost("/open/sweep", async (OpenPaymentsHandler open, CancellationToken cancellationToken) =>
+            Results.Ok(new { finished = await open.SweepAsync(200, cancellationToken) }))
+            .RequireAuthorization(PaymentPermissions.SweepNow);
+
         admin.MapGet("/reconciliation/{provider}/latest", async (string provider, IPaymentStore store, CancellationToken cancellationToken) =>
             await store.LatestRunAsync(provider, cancellationToken) is { } run ? Results.Ok(run) : Results.NotFound())
             .RequireAuthorization(PaymentPermissions.Read);

@@ -70,6 +70,19 @@ public sealed class PaymentsApiTests(SqlServerFixture sql)
         response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
 
+    [Fact]
+    public async Task Steward_runs_the_open_payments_sweep_now_and_a_customer_cannot()
+    {
+        await using var host = await PaymentsHost.StartAsync(sql);
+        using var steward = host.ClientFor("client:steward", "Service");
+        using var customer = host.ClientFor(Guid.NewGuid().ToString(), "Customer");
+
+        using var swept = await steward.PostAsync(new Uri("/admin/payments/open/sweep", UriKind.Relative), null, TestContext.Current.CancellationToken);
+        using var refused = await customer.PostAsync(new Uri("/admin/payments/open/sweep", UriKind.Relative), null, TestContext.Current.CancellationToken);
+
+        (swept.StatusCode, refused.StatusCode).ShouldBe((HttpStatusCode.OK, HttpStatusCode.Forbidden));
+    }
+
     private static Task<HttpResponseMessage> PostAsync(HttpClient client, string path, byte[] body, string signature)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri(path, UriKind.Relative)) { Content = new ByteArrayContent(body) };
